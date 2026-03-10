@@ -26,8 +26,17 @@ if (fs.existsSync(SESSION_DIR)) {
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
+        executablePath: process.env.CHROMIUM_PATH || '/usr/bin/chromium',
         headless: true,
-        args: ['--no-sandbox', '--disable-setuid-sandbox']
+        args: [
+            '--no-sandbox',
+            '--disable-setuid-sandbox',
+            '--disable-dev-shm-usage',
+            '--disable-gpu',
+            '--no-first-run',
+            '--no-zygote',
+            '--single-process'
+        ]
     }
 });
 
@@ -87,7 +96,6 @@ const sendInvoiceToWhatsApp = async (phone, text, pdfBuffer, filename) => {
         const chatId = `${cleanPhone}@c.us`;
 
         // Create MessageMedia object from PDF Buffer
-        // Safeguard conversion: Puppeteer may return Uint8Array. Buffer.from ensures correct toString conversion.
         const base64Data = Buffer.from(pdfBuffer).toString('base64');
         const media = new MessageMedia('application/pdf', base64Data, filename);
 
