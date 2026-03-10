@@ -2,12 +2,25 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
+const { execSync } = require('child_process');
 
 console.log('Initializing WhatsApp Client...');
 
+// Auto-detect Chromium path
+let chromiumPath = process.env.CHROMIUM_PATH;
+if (!chromiumPath) {
+    try {
+        chromiumPath = execSync('which chromium || which chromium-browser || find /nix -name "chromium" 2>/dev/null | head -1').toString().trim();
+        console.log('Auto-detected Chromium at:', chromiumPath);
+    } catch (e) {
+        chromiumPath = '/usr/bin/chromium';
+        console.log('Could not detect Chromium, using default:', chromiumPath);
+    }
+}
+console.log('Using Chromium path:', chromiumPath);
+
 const SESSION_DIR = path.join(__dirname, '../.wwebjs_auth/session');
 
-// Gracefully handle browser lock cleanup before starting so we don't wipe out the login session
 if (fs.existsSync(SESSION_DIR)) {
     const lockFiles = ['lockfile', 'SingletonLock', 'SingletonCookie', 'SingletonSocket'];
     lockFiles.forEach(file => {
@@ -26,7 +39,7 @@ if (fs.existsSync(SESSION_DIR)) {
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        executablePath: process.env.CHROMIUM_PATH || '/run/current-system/sw/bin/chromium',
+        executablePath: chromiumPath,
         headless: true,
         args: [
             '--no-sandbox',
@@ -67,7 +80,6 @@ client.on('disconnected', (reason) => {
     client.initialize().catch(err => console.error(err));
 });
 
-// Initialize the client asynchronously
 client.initialize().catch(err => {
     console.error('Failed to initialize WhatsApp Client:', err);
 });
