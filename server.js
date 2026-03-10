@@ -34,8 +34,8 @@ app.get('/', (req, res) => {
 const PORT = process.env.PORT || 5000;
 
 // Connect to MongoDB
-console.log('Attempting to connect to MongoDB at:', process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/billeasy');
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/billeasy')
+console.log('Attempting to connect to MongoDB at:', process.env.MONGODB_URI);
+mongoose.connect(process.env.MONGODB_URI)
     .then(() => {
         console.log('MongoDB connected successfully');
         const server = app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
@@ -62,7 +62,7 @@ mongoose.connect(process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/billeasy'
 
         process.on('SIGINT', gracefulShutdown);
         process.on('SIGTERM', gracefulShutdown);
-        process.on('SIGUSR2', gracefulShutdown); // Nodemon restart signal
+        process.on('SIGUSR2', gracefulShutdown);
     })
     .catch(error => {
         console.error('MongoDB connection error:', error.message);
