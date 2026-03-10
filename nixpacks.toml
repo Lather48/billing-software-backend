@@ -5,8 +5,7 @@ nixPkgs = ["chromium", "nodejs_20"]
 cmds = ["npm install"]
 
 [start]
-cmd = "node server.js"
+cmd = "node -e \"const {execSync} = require('child_process'); try { console.log('Chromium path:', execSync('which chromium').toString()); } catch(e) { console.log('which failed, trying find...'); }\" && node server.js"
 
 [variables]
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
-CHROMIUM_PATH = "/run/current-system/sw/bin/chromium"
