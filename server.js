@@ -13,7 +13,13 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ limit: '10mb', extended: true }));
 
 // Enable CORS
-app.use(cors());
+app.use(cors({
+    origin: [
+        'http://localhost:5173',
+        'https://billing-software-frontend-neon.vercel.app'
+    ],
+    credentials: true
+}));
 
 // Define Routes
 app.use('/api/auth', require('./routes/auth'));
@@ -68,4 +74,3 @@ mongoose.connect(process.env.MONGODB_URI)
         console.error('MongoDB connection error:', error.message);
         process.exit(1);
     });
-
