@@ -2,22 +2,8 @@ const { Client, LocalAuth, MessageMedia } = require('whatsapp-web.js');
 const qrcode = require('qrcode-terminal');
 const fs = require('fs');
 const path = require('path');
-const { execSync } = require('child_process');
 
 console.log('Initializing WhatsApp Client...');
-
-// Auto-detect Chromium path
-let chromiumPath = process.env.CHROMIUM_PATH;
-if (!chromiumPath) {
-    try {
-        chromiumPath = execSync('which chromium || which chromium-browser || find /nix -name "chromium" 2>/dev/null | head -1').toString().trim();
-        console.log('Auto-detected Chromium at:', chromiumPath);
-    } catch (e) {
-        chromiumPath = '/usr/bin/chromium';
-        console.log('Could not detect Chromium, using default:', chromiumPath);
-    }
-}
-console.log('Using Chromium path:', chromiumPath);
 
 const SESSION_DIR = path.join(__dirname, '../.wwebjs_auth/session');
 
@@ -39,7 +25,6 @@ if (fs.existsSync(SESSION_DIR)) {
 const client = new Client({
     authStrategy: new LocalAuth(),
     puppeteer: {
-        executablePath: chromiumPath,
         headless: true,
         args: [
             '--no-sandbox',
